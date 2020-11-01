@@ -1,0 +1,50 @@
+MapFormat: 11
+
+RequiresMod: hv
+
+Title: Fire Watch
+
+Author: Matt
+
+License: CC-BY-SA-4.0
+
+Tileset: PLANET
+
+MapSize: 130,130
+
+Bounds: 1,1,128,128
+
+Visibility: MissionSelector
+
+Categories: Conquest
+
+Players:
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+		Faction: yi
+	PlayerReference@Creeps:
+		Name: Creeps
+		NonCombatant: True
+		Faction: yi
+		Enemies: Multi0
+	PlayerReference@FireBrigade:
+		Name: FireBrigade
+		Playable: True
+		LockFaction: True
+		Faction: sc
+		LockColor: True
+		Color: FF0000
+		Enemies: Creeps
+
+Actors:
+	Actor0: base
+		Owner: FireBrigade
+		Location: 67,61
+
+Rules: hv|rules/campaign.yaml, rules.yaml
+
+Sequences: sequences.yaml
+
+Weapons: weapons.yaml
