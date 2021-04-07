@@ -22,16 +22,22 @@ namespace OpenRA.Mods.HV.Effects
 		readonly Target target;
 		readonly Player firedBy;
 		readonly WeaponInfo weapon;
+		readonly Animation animation;
+		readonly string palette;
 
 		int weaponDelay;
 		bool impacted = false;
 
-		public Railgun(Player firedBy, WeaponInfo weapon, World world, WPos launchPos, in Target target, int delay)
+		public Railgun(Player firedBy, WeaponInfo weapon, World world, WPos launchPos, in Target target, string effect, string sequence, string palette, int delay)
 		{
 			this.target = target;
 			this.firedBy = firedBy;
 			this.weapon = weapon;
+			this.palette = palette;
 			weaponDelay = delay;
+
+			animation = new Animation(world, effect);
+			animation.PlayThen(sequence, () => Finish(world));
 
 			if (weapon.Report != null && weapon.Report.Any())
 				Game.Sound.Play(SoundType.World, weapon.Report, world, launchPos);
@@ -39,6 +45,8 @@ namespace OpenRA.Mods.HV.Effects
 
 		public void Tick(World world)
 		{
+			animation.Tick();
+
 			if (!impacted && weaponDelay-- <= 0)
 			{
 				var warheadArgs = new WarheadArgs
@@ -51,14 +59,17 @@ namespace OpenRA.Mods.HV.Effects
 
 				weapon.Impact(target, warheadArgs);
 				impacted = true;
-
-				world.AddFrameEndTask(w => w.Remove(this));
 			}
 		}
 
 		public IEnumerable<IRenderable> Render(WorldRenderer wr)
 		{
-			return Enumerable.Empty<IRenderable>();
+			return animation.Render(target.CenterPosition, wr.Palette(palette));
+		}
+
+		void Finish(World world)
+		{
+			world.AddFrameEndTask(w => w.Remove(this));
 		}
 	}
 }
