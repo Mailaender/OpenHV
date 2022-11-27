@@ -37,7 +37,7 @@ jobs:
           file_glob: true
           file: build/linux/*
 
-  macos:
+  macos-build:
     name: macOS Disk Images
     runs-on: macos-11
 
@@ -55,17 +55,73 @@ jobs:
 
       - name: Package Disk Images
         env:
-          MACOS_DEVELOPER_IDENTITY: ${{ secrets.MACOS_DEVELOPER_IDENTITY }}
           MACOS_DEVELOPER_CERTIFICATE_BASE64: ${{ secrets.MACOS_DEVELOPER_CERTIFICATE_BASE64 }}
           MACOS_DEVELOPER_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_DEVELOPER_CERTIFICATE_PASSWORD }}
-          MACOS_DEVELOPER_USERNAME: ${{ secrets.MACOS_DEVELOPER_USERNAME }}
-          MACOS_DEVELOPER_PASSWORD: ${{ secrets.MACOS_DEVELOPER_PASSWORD }}
         run: |
           make engine
           mkdir -p build/macos
           ./packaging/macos/buildpackage.sh "${GIT_TAG}" "${PWD}/build/macos"
 
-      - name: Upload Packages
+      - name: Upload macOS Disk Image
+        uses: actions/upload-artifact@v2
+        with:
+          name: Disk Images
+          path: build/macos/*.dmg
+
+  macos-notarisation:
+    name: macOS Notarisation
+    runs-on: macos-11
+    needs: [macos-build]
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v2
+
+      - name: Download Unnotarized Disk Images
+        uses: actions/download-artifact@v3
+        with:
+          name: Disk Images
+
+      - name: Notarize Disk Image
+        env:
+          MACOS_DEVELOPER_IDENTITY: ${{ secrets.MACOS_DEVELOPER_IDENTITY }}
+          MACOS_DEVELOPER_USERNAME: ${{ secrets.MACOS_DEVELOPER_USERNAME }}
+          MACOS_DEVELOPER_PASSWORD: ${{ secrets.MACOS_DEVELOPER_PASSWORD }}
+        run: |
+          ./packaging/macos/notarize.sh "${PWD}/build/macos/build.dmg"
+
+      - name: Upload Package
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+          file: build/macos/*
+
+  macos-notarisation-mono:
+    name: macOS Notarisation Mono
+    runs-on: macos-11
+    needs: [macos-build]
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v2
+
+      - name: Download Unnotarized Disk Images
+        uses: actions/download-artifact@v3
+        with:
+          name: Disk Images
+
+      - name: Notarize Disk Image
+        env:
+          MACOS_DEVELOPER_IDENTITY: ${{ secrets.MACOS_DEVELOPER_IDENTITY }}
+          MACOS_DEVELOPER_USERNAME: ${{ secrets.MACOS_DEVELOPER_USERNAME }}
+          MACOS_DEVELOPER_PASSWORD: ${{ secrets.MACOS_DEVELOPER_PASSWORD }}
+        run: |
+          ./packaging/macos/notarize.sh "${PWD}/build/macos/build-mono.dmg"
+
+      - name: Upload Package
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
