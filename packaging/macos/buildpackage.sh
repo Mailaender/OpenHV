@@ -9,10 +9,6 @@
 #                                       Generate using `base64 certificate.p12 | pbcopy`
 #   MACOS_DEVELOPER_CERTIFICATE_PASSWORD: password to unlock the MACOS_DEVELOPER_CERTIFICATE_BASE64 certificate
 #
-# The applicaton bundles will be notarized if the following environment variables are defined:
-#   MACOS_DEVELOPER_USERNAME: Email address for the developer account
-#   MACOS_DEVELOPER_PASSWORD: App-specific password for the developer account
-#
 set -e
 
 if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -175,7 +171,8 @@ build_platform() {
 
 	# Sign binaries with developer certificate
 	if [ -n "${MACOS_DEVELOPER_IDENTITY}" ]; then
-		codesign -s "${MACOS_DEVELOPER_IDENTITY}" --timestamp --options runtime -f --entitlements "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/entitlements.plist" --deep "${LAUNCHER_DIR}"
+		codesign --sign "${MACOS_DEVELOPER_IDENTITY}" --timestamp --options runtime -f --entitlements "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/entitlements.plist" --deep "${LAUNCHER_DIR}"
+		spctl -a -t open --context context:primary-signature "${LAUNCHER_DIR}"
 	fi
 
 	echo "Packaging disk image"
@@ -227,68 +224,6 @@ build_platform() {
 	rm -rf "${BUILTDIR}"
 }
 
-notarize_package() {
-	DMG_PATH="${1}"
-	NOTARIZE_DMG_PATH="${DMG_PATH%.*}"-notarization.dmg
-	echo "Submitting ${DMG_PATH} for notarization"
-
-	# Reset xcode search path to fix xcrun not finding altool
-	sudo xcode-select -r
-
-	# Create a temporary read-only dmg for submission (notarization service rejects read/write images)
-	hdiutil convert "${DMG_PATH}" -format ULFO -ov -o "${NOTARIZE_DMG_PATH}"
-
-	NOTARIZATION_UUID=$(xcrun altool --notarize-app --primary-bundle-id "net.openra.modsdk" -u "${MACOS_DEVELOPER_USERNAME}" -p "${MACOS_DEVELOPER_PASSWORD}" --file "${NOTARIZE_DMG_PATH}" 2>&1 | awk -F' = ' '/RequestUUID/ { print $2; exit }')
-	if [ -z "${NOTARIZATION_UUID}" ]; then
-		echo "Submission failed"
-		exit 1
-	fi
-
-	echo "${DMG_PATH} submission UUID is ${NOTARIZATION_UUID}"
-	rm "${NOTARIZE_DMG_PATH}"
-
-	while :; do
-		sleep 30
-		NOTARIZATION_RESULT=$(xcrun altool --notarization-info "${NOTARIZATION_UUID}" -u "${MACOS_DEVELOPER_USERNAME}" -p "${MACOS_DEVELOPER_PASSWORD}" 2>&1 | awk -F': ' '/Status/ { print $2; exit }')
-		echo "${DMG_PATH}: ${NOTARIZATION_RESULT}"
-
-		if [ "${NOTARIZATION_RESULT}" == "invalid" ]; then
-			NOTARIZATION_LOG_URL=$(xcrun altool --notarization-info "${NOTARIZATION_UUID}" -u "${MACOS_DEVELOPER_USERNAME}" -p "${MACOS_DEVELOPER_PASSWORD}" 2>&1 | awk -F': ' '/LogFileURL/ { print $2; exit }')
-			echo "${NOTARIZATION_UUID} failed notarization with error:"
-			curl -s "${NOTARIZATION_LOG_URL}" -w "\n"
-			exit 1
-		fi
-
-		if [ "${NOTARIZATION_RESULT}" == "success" ]; then
-			echo "${DMG_PATH}: Stapling tickets"
-			DMG_DEVICE=$(hdiutil attach -readwrite -noverify -noautoopen "${DMG_PATH}" | egrep '^/dev/' | sed 1q | awk '{print $1}')
-			sleep 2
-
-			xcrun stapler staple "/Volumes/${PACKAGING_DISPLAY_NAME}/${PACKAGING_OSX_APP_NAME}"
-
-			sync
-			sync
-
-			hdiutil detach "${DMG_DEVICE}"
-			break
-		fi
-	done
-}
-
-finalize_package() {
-	PLATFORM="${1}"
-	INPUT_PATH="${2}"
-	OUTPUT_PATH="${3}"
-
-	if [ "${PLATFORM}" = "mono" ]; then
-		hdiutil convert "${INPUT_PATH}" -format UDZO -imagekey zlib-level=9 -ov -o "${OUTPUT_PATH}"
-	else
-		# ULFO offers better compression and faster decompression speeds, but is only supported by 10.11+
-		hdiutil convert "${INPUT_PATH}" -format ULFO -ov -o "${OUTPUT_PATH}"
-	fi
-	rm "${INPUT_PATH}"
-}
-
 build_platform "standard" "build.dmg"
 build_platform "mono" "build-mono.dmg"
 
@@ -296,12 +231,4 @@ if [ -n "${MACOS_DEVELOPER_CERTIFICATE_BASE64}" ] && [ -n "${MACOS_DEVELOPER_CER
 	security delete-keychain build.keychain
 fi
 
-if [ -n "${MACOS_DEVELOPER_USERNAME}" ] && [ -n "${MACOS_DEVELOPER_PASSWORD}" ]; then
-	# Parallelize processing
-	(notarize_package "build.dmg") &
-	(notarize_package "build-mono.dmg") &
-	wait
-fi
 
-finalize_package "standard" "build.dmg" "${OUTPUTDIR}/${PACKAGING_INSTALLER_NAME}-${TAG}.dmg"
-finalize_package "mono" "build-mono.dmg" "${OUTPUTDIR}/${PACKAGING_INSTALLER_NAME}-${TAG}-mono.dmg"
