@@ -1,0 +1,39 @@
+World:
+	StartingUnits@BaseYI:
+		BaseActor: module
+	StartingUnits@BaseSC:
+		BaseActor: module2
+	-StartingUnits@MinerYI:
+	-StartingUnits@MinerSC:
+	-StartingUnits@ScoutYI:
+	-StartingUnits@ScoutSC:
+
+Player:
+	-ConquestVictoryConditions:
+	StrategicVictoryConditions:
+		HoldDuration: 1500
+	-ModularBot@RogueAI:
+	ModularBot@Dominator:
+		Name: Domination AI
+		Type: dominator
+	GrantConditionOnBotOwner@Dominator:
+		Condition: enable-dominator-ai
+		Bots: dominator
+	StrategicVictoryBotModuleInfo@Dominator:
+		RequiresCondition: enable-dominator-ai
+	UnitBuilderBotModule@Dominator:
+		IdleBaseUnitsMaximum: 30
+		RequiresCondition: enable-dominator-ai
+		UnitQueues: Pod
+		UnitsToBuild:
+			scout1: 1
+			scout2: 1
+			mortarpod: 1
+			flamepod: 1
+			elitepod: 1
+			sniperpod: 1
+			brokerpod: 1
+			bomberpod: 1
+		UnitLimits:
+			bomberpod: 1
+			brokerpod: 9

@@ -1,0 +1,58 @@
+MapFormat: 12
+
+RequiresMod: hv
+
+Title: Demon City
+
+Author: Matt
+
+Tileset: PLANET
+
+MapSize: 66,66
+
+Bounds: 1,1,64,64
+
+Visibility: Lobby
+
+Categories: Domination
+
+Players:
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+		Faction: yi
+	PlayerReference@Creeps:
+		Name: Creeps
+		NonCombatant: True
+		Faction: yi
+		Enemies: Multi0, Multi1
+	PlayerReference@Multi0:
+		Name: Multi0
+		Playable: True
+		Faction: Random
+		Enemies: Creeps
+	PlayerReference@Multi1:
+		Name: Multi1
+		Playable: True
+		Faction: Random
+		Enemies: Creeps
+
+Actors:
+	Actor0: mpspawn
+		Owner: Neutral
+		Location: 33,10
+	Actor1: mpspawn
+		Owner: Neutral
+		Location: 30,47
+	Actor2: flagpost
+		Owner: Neutral
+		Location: 37,25
+	Actor3: flagpost
+		Owner: Neutral
+		Location: 18,25
+	Actor4: flagpost
+		Owner: Neutral
+		Location: 52,26
+
+Rules: rules.yaml
