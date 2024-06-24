@@ -44,6 +44,7 @@ jobs:
             ALL_CHANGED_SPRITES: ${{ steps.changed-files.outputs.sprites_all_changed_files }}
         run: |
           make check-bits BIT_FILES=${ALL_CHANGED_SPRITES}
+          make check-sprite-metadata BIT_FILES=${ALL_CHANGED_SPRITES}
           sudo apt-get install pngcheck
           make check-pngs
 

@@ -266,7 +266,7 @@ ifneq ("$(PREVIEW_FILES)","")
 	done
 endif
 
-check-bits: engine
+check-sprite-metadata: engine
 ifneq ("$(BIT_FILES)","")
 	@echo "Checking PNG sheet metadata..."
 	@for BIT in $(BIT_FILES); do \
@@ -284,6 +284,17 @@ endif
 check-pngs:
 ifneq ("$(BIT_FILES)","")
 	@pngcheck -c $(BIT_FILES)
+endif
+
+check-sprite-depth:
+ifneq ("$(BIT_FILES)","")
+	@echo "Checking if PNG files are indexed..."
+	@for BIT in $(BIT_FILES); do \
+		TYPE=$$(identify -format "%[type]" $$BIT); \
+		if [ $$TYPE != "Palette" ]; then \
+			echo "$$BIT is not an 8-bit indexed PNG."; \
+		fi; \
+	done
 endif
 
 check-maps:
