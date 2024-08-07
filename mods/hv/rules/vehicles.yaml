@@ -596,7 +596,7 @@ ECMTANK:
 		MinimumScanTimeInterval: 5
 		MaximumScanTimeInterval: 15
 	AutoTargetPriority@Default:
-		ValidTargets: Jammable
+		ValidTargets: Jammable, PowerGrid
 	-Targetable@ECM:
 	UpdatesPlayerStatistics:
 		AddToArmyValue: true

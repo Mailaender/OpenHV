@@ -37,7 +37,7 @@ ElectronicCountermeasure:
 	ReloadDelay: 20
 	Range: 7c0
 	Report: Sonic1.ogg, Sonic2.ogg, Sonic3.ogg
-	ValidTargets: Vehicle
+	ValidTargets: Vehicle, PowerGrid
 	InvalidTargets: DisabledVehicle
 	Projectile: Bullet
 		Speed: 150
@@ -56,6 +56,9 @@ ElectronicCountermeasure:
 		Amount: 8
 		AffectsParent: true
 		ValidTargets: Ground
+	Warhead@Overload: PowerOutage
+		Duration: 10
+		ValidTargets: PowerGrid
 
 ElectronicCounterMeasureEffect:
 	ReloadDelay: 1

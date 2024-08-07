@@ -223,6 +223,7 @@ OUTPOST2:
 
 GENERATOR:
 	Inherits: ^BaseBuilding
+	Inherits@Sabotageable: ^VulnerableToPowerOutage
 	Inherits@Shape: ^2x2Shape
 	Inherits@Flame: ^BuildingFlame2
 	Selectable:

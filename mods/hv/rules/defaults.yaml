@@ -499,6 +499,21 @@
 			TopLeft: -3072, -4096
 			BottomRight: 3072, 4096
 
+^VulnerableToPowerOutage:
+	WithColoredOverlay@Disabled:
+		RequiresCondition: disabled
+		Color: 000000B4
+	GrantCondition@Disabled:
+		RequiresCondition: power-outage
+		Condition: disabled
+	AffectedByPowerOutage:
+		Condition: power-outage
+	Power:
+		RequiresCondition: !disabled
+	Targetable@Online:
+		RequiresCondition: !disabled
+		TargetTypes: Ground, Structure, PowerGrid
+
 ^Building:
 	Inherits@Exists: ^ExistsInWorld
 	Inherits@Sprite: ^SpriteActor
