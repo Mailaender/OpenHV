@@ -1,0 +1,10 @@
+objective-failed = 任务失败
+objective-completed = 任务完成
+primary = 主要目标
+secondary = 次要目标
+new-primary-objective = 新的主要目标
+new-secondary-objective = 新的次要目标
+warning = 警告
+reminder = 提示
+current-wave = 进攻波次：{ $wave } / { $waves }
+no-more-enemies = 敌方已派出所有剩余兵力

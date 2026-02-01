@@ -11,3 +11,51 @@ Localisation:
 			FluentMessages:
 				hv|fluent/pl/campaign.ftl
 				hv|fluent/pl/rules.ftl
+		Chinese:
+			Locale: zh-Hans
+			FluentMessages:
+				hv|fluent/zh-Hans/campaign.ftl
+				hv|fluent/zh-Hans/common.ftl
+				hv|fluent/zh-Hans/lua.ftl
+				hv|fluent/zh-Hans/rules.ftl
+			Fonts:
+				TinyPixel:
+					Font: hv|bits/fonts/terminal-grotesque.ttf
+					Size: 11
+					Ascender: 9
+				Tiny:
+					Font: hv|bits/fonts/SourceHanSansK-Regular.ttf
+					Size: 10
+					Ascender: 8
+				TinyBold:
+					Font: hv|bits/fonts/SourceHanSansK-Medium.ttf
+					Size: 10
+					Ascender: 8
+				Small:
+					Font: hv|bits/fonts/SourceHanSansK-Regular.ttf
+					Size: 12
+					Ascender: 9
+				Regular:
+					Font: hv|bits/fonts/SourceHanSansK-Regular.ttf
+					Size: 14
+					Ascender: 11
+				Bold:
+					Font: hv|bits/fonts/SourceHanSansK-Medium.ttf
+					Size: 14
+					Ascender: 11
+				MediumBold:
+					Font: hv|bits/fonts/SourceHanSansK-Medium.ttf
+					Size: 18
+					Ascender: 14
+				LargeBold:
+					Font: hv|bits/fonts/SourceHanSansK-Medium.ttf
+					Size: 16
+					Ascender: 7
+				BigBold:
+					Font: hv|bits/fonts/SourceHanSansK-Medium.ttf
+					Size: 24
+					Ascender: 18
+				Title:
+					Font: hv|bits/fonts/PressStart2P.ttf
+					Size: 20
+					Ascender: 14

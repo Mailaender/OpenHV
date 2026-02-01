@@ -37,6 +37,9 @@ namespace OpenRA.Mods.HV
 		[FieldLoader.Ignore]
 		public readonly ImmutableArray<string> FluentMessages;
 
+		[FieldLoader.Ignore]
+		public readonly ImmutableArray<string> Fonts;
+
 		public Language(MiniYaml yaml)
 		{
 			FieldLoader.Load(this, yaml);
@@ -56,19 +59,37 @@ namespace OpenRA.Mods.HV
 	public class Localisation : IGlobalModData
 	{
 		[UnsafeAccessor(UnsafeAccessorKind.Field, Name = "FluentMessages")]
-		internal static extern ref ImmutableArray<string> BodgePaths(Manifest manifest);
+		internal static extern ref ImmutableArray<string> BodgeFluentMessages(Manifest manifest);
 
-		[IncludeFluentReferences(LintDictionaryReference.Values)]
+		[UnsafeAccessor(UnsafeAccessorKind.Field, Name = "FontList")]
+		internal static extern ref FrozenDictionary<string, FontData> BodgeFonts(Fonts fonts);
+
 		[FieldLoader.LoadUsing(nameof(LoadLanguages))]
 		public readonly FrozenDictionary<string, Language> Languages = null;
+
+		[FieldLoader.LoadUsing(nameof(LoadFonts))]
+		public readonly FrozenDictionary<string, FontData> FontList;
 
 		static FrozenDictionary<string, Language> LoadLanguages(MiniYaml yaml)
 		{
 			var dictionary = new Dictionary<string, Language>();
 
-			var sourcesNode = yaml.Nodes.Single(n => n.Key == "Languages");
-			foreach (var s in sourcesNode.Value.Nodes)
-				dictionary.Add(s.Key, new Language(s.Value));
+			var languageNode = yaml.Nodes.Single(n => n.Key == "Languages");
+			foreach (var node in languageNode.Value.Nodes)
+				dictionary.Add(node.Key, new Language(node.Value));
+
+			var fontNode = yaml.Nodes.Single(n => n.Key == "FontList");
+			foreach (var node in fontNode.Value.Nodes)
+				dictionary.Add(node.Key, new Language(node.Value));
+
+			return dictionary.ToFrozenDictionary();
+		}
+
+		static object LoadFonts(MiniYaml miniYaml)
+		{
+			var dictionary = new Dictionary<string, FontData>(miniYaml.Nodes.Length);
+			foreach (var node in miniYaml.Nodes)
+				dictionary.Add(node.Key, FieldLoader.Load<FontData>(node.Value));
 
 			return dictionary.ToFrozenDictionary();
 		}
@@ -88,10 +109,20 @@ namespace OpenRA.Mods.HV
 			if (selectedLanguage.Locale == LocalisationSettings.DefaultLocale)
 				return;
 
-			BodgePaths(Game.ModData.Manifest) = BodgePaths(Game.ModData.Manifest).ToArray()
+			BodgeFluentMessages(Game.ModData.Manifest) = BodgeFluentMessages(Game.ModData.Manifest).ToArray()
 				.Append(selectedLanguage.FluentMessages.ToArray()).ToImmutableArray();
 
 			FluentProvider.Initialize(Game.ModData.Manifest, Game.ModData.DefaultFileSystem);
+
+			if (!selectedLanguage.Fonts.IsEmpty)
+			{
+				var fonts = Game.ModData.GetOrCreate<Fonts>();
+				fonts.FontList = selectedLanguage.Fonts.ToArray();
+				BodgeFonts(fonts) = BodgeFonts(fonts).ToArray()
+					.Append(selectedLanguage.Fonts.ToArray()).ToImmutableArray();
+
+				Game.Renderer.InitializeFonts(Game.ModData);
+			}
 		}
 	}
 }
