@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <EngineRootPath>../engine</EngineRootPath>
+  </PropertyGroup>
+  <Import Project="$(EngineRootPath)/Directory.Build.props" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>OpenHV</AssemblyName>
+    <!-- Windows packages use the engine's OpenRA.WindowsLauncher, which would otherwise collide with OpenHV.exe -->
+    <IsPublishable Condition="$(TargetPlatform.StartsWith('win-'))">false</IsPublishable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(EngineRootPath)/OpenRA.Game/OpenRA.Game.csproj" />
+  </ItemGroup>
+</Project>

@@ -72,7 +72,7 @@ if [ ! -d "${OUTPUTDIR}" ]; then
 fi
 
 echo "Building core files"
-install_assemblies "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${APPDIR}${PREFIX}/lib/openhv" ${TARGETPLATFORM} "True" "False" "False"
+install_assemblies "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${APPDIR}${PREFIX}/lib/openhv" ${TARGETPLATFORM} "False" "False" "False"
 install_data "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${APPDIR}${PREFIX}/lib/openhv"
 
 for f in ${PACKAGING_COPY_ENGINE_FILES}; do

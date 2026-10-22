@@ -16,7 +16,7 @@ install_executables() {
 
 	install -d "${BINDIR}"
 
-	sed "s#lib/openra#lib/openhv#" "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/linux/openra.appimage.in" | sed "s/openra-{MODID}/openhv/g" | sed "s/{MODID}/${MOD_ID}/g" | sed "s/{TAG}/${TAG}/g" | sed "s/{MODNAME}/${PACKAGING_DISPLAY_NAME}/g" | sed "s/{MODINSTALLERNAME}/${PACKAGING_INSTALLER_NAME}/g" | sed "s|{MODFAQURL}|${PACKAGING_FAQ_URL}|g" > "${BINDIR}/openhv"
+	sed "s#lib/openra#lib/openhv#" "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/linux/openra.appimage.in" | sed "s/openra-{MODID}/openhv/g" | sed "s/{MODID}/${MOD_ID}/g" | sed "s/{TAG}/${TAG}/g" | sed "s/{MODNAME}/${PACKAGING_DISPLAY_NAME}/g" | sed "s/{MODINSTALLERNAME}/${PACKAGING_INSTALLER_NAME}/g" | sed "s|{MODFAQURL}|${PACKAGING_FAQ_URL}|g" | sed 's#\./OpenRA #./OpenHV #' | sed 's#${XDG_CONFIG_HOME:-${HOME}/.config}/openra/Logs#${XDG_STATE_HOME:-${HOME}/.local/state}/openhv/logs#' > "${BINDIR}/openhv"
 	chmod 0755 "${BINDIR}/openhv"
 
 	sed "s#lib/openra#lib/openhv#" "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/linux/openra-server.appimage.in" | sed "s/{MODID}/${MOD_ID}/g" > "${BINDIR}/openhv-server"

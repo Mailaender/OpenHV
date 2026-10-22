@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/engine/bin/OpenRA.dll",
+            "program": "${workspaceRoot}/engine/bin/OpenHV.dll",
             "windows": {
-                "program": "${workspaceRoot}/engine/bin/OpenRA.exe",
+                "program": "${workspaceRoot}/engine/bin/OpenHV.exe",
             },
             "args": [
                 "Engine.EngineDir=${workspaceRoot}/engine",

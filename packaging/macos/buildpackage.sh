@@ -127,13 +127,15 @@ fi
 # Compile universal (x86_64 + arm64) Launcher and arch-specific apphosts
 clang "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/apphost.c" -o "${LAUNCHER_ASSEMBLY_DIR}/apphost-x86_64" -framework AppKit -target x86_64-apple-macos10.15
 clang "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/apphost.c" -o "${LAUNCHER_ASSEMBLY_DIR}/apphost-arm64" -framework AppKit -target arm64-apple-macos10.15
-clang "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/launcher.m" -o "${LAUNCHER_ASSEMBLY_DIR}/Launcher-x86_64" -framework AppKit -target x86_64-apple-macos10.11
-clang "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/launcher.m" -o "${LAUNCHER_ASSEMBLY_DIR}/Launcher-arm64" -framework AppKit -target arm64-apple-macos10.15
+sed -e "s|/OpenRA.dll|/OpenHV.dll|" -e "s|Application Support/OpenRA/Logs|Application Support/OpenHV/Logs|" "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}/packaging/macos/launcher.m" > launcher.m
+clang launcher.m -o "${LAUNCHER_ASSEMBLY_DIR}/Launcher-x86_64" -framework AppKit -target x86_64-apple-macos10.11
+clang launcher.m -o "${LAUNCHER_ASSEMBLY_DIR}/Launcher-arm64" -framework AppKit -target arm64-apple-macos10.15
+rm launcher.m
 lipo -create -output "${LAUNCHER_ASSEMBLY_DIR}/Launcher" "${LAUNCHER_ASSEMBLY_DIR}/Launcher-x86_64" "${LAUNCHER_ASSEMBLY_DIR}/Launcher-arm64"
 rm "${LAUNCHER_ASSEMBLY_DIR}/Launcher-x86_64" "${LAUNCHER_ASSEMBLY_DIR}/Launcher-arm64"
 
-install_assemblies "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${LAUNCHER_ASSEMBLY_DIR}/x86_64" "osx-x64" "True" "False" "False"
-install_assemblies "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${LAUNCHER_ASSEMBLY_DIR}/arm64" "osx-arm64" "True" "False" "False"
+install_assemblies "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${LAUNCHER_ASSEMBLY_DIR}/x86_64" "osx-x64" "False" "False" "False"
+install_assemblies "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${LAUNCHER_ASSEMBLY_DIR}/arm64" "osx-arm64" "False" "False" "False"
 install_data "${TEMPLATE_ROOT}/${ENGINE_DIRECTORY}" "${LAUNCHER_RESOURCES_DIR}"
 
 for f in ${PACKAGING_COPY_ENGINE_FILES}; do

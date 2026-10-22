@@ -12,11 +12,11 @@ if "!ENGINE_VERSION!" == "" goto badconfig
 if "!ENGINE_DIRECTORY!" == "" goto badconfig
 
 set TEMPLATE_DIR=%CD%
-if not exist %ENGINE_DIRECTORY%\bin\OpenRA.dll goto noengine
+if not exist %ENGINE_DIRECTORY%\bin\OpenHV.dll goto noengine
 >nul find %ENGINE_VERSION% %ENGINE_DIRECTORY%\VERSION || goto noengine
 cd %ENGINE_DIRECTORY%
 
-dotnet bin\OpenRA.dll -- Game.Mod=%MOD_ID% Engine.EngineDir=".." Engine.LaunchPath="%TEMPLATE_LAUNCHER%" "Engine.ModSearchPaths=%MOD_SEARCH_PATHS%"  "%*"
+dotnet bin\OpenHV.dll -- Game.Mod=%MOD_ID% Engine.EngineDir=".." Engine.LaunchPath="%TEMPLATE_LAUNCHER%" "Engine.ModSearchPaths=%MOD_SEARCH_PATHS%"  "%*"
 set ERROR=%errorlevel%
 cd %TEMPLATE_DIR%
 
@@ -39,7 +39,7 @@ exit /b
 :crashdialog
 echo ----------------------------------------
 echo OpenHV has encountered a fatal error.
-echo   * Log Files are available in Documents\OpenRA\Logs
+echo   * Log Files are available in %APPDATA%\OpenHV\Logs
 echo   * FAQ is available at https://github.com/OpenRA/OpenRA/wiki/FAQ
 echo ----------------------------------------
 pause
